@@ -17,3 +17,9 @@ export const loginSchema = Joi.object({
 export const updateSubscriptionSchema = Joi.object({
   subscription: Joi.string().valid("starter", "pro", "business").required(),
 });
+
+export const verificationEmailSchema = Joi.object({
+  email: Joi.string().email(),
+})
+  .min(1)
+  .message("Missing required field email");

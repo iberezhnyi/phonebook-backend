@@ -10,8 +10,8 @@ export const createContactSchema = Joi.object({
   email: Joi.string().email().required(),
   phone: Joi.string().required().min(3).messages({
     "string.base": `"phone", should be a type of 'text'`,
-    "string.min": `"phone" should have a minimum length of {#limit}`,
     "string.empty": `"phone" cannot be an empty field`,
+    "string.min": `"phone" should have a minimum length of {#limit}`,
     "any.required": `"phone" is a required field`,
   }),
   favorite: Joi.boolean(),
