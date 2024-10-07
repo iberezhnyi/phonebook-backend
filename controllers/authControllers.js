@@ -1,21 +1,12 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import gravatar from "gravatar";
-import nodemailer from "nodemailer";
 import crypto from "node:crypto";
 import HttpError from "../helpers/HttpError.js";
 import { User } from "../models/user.js";
+import { sendMailService } from "../helpers/sendMailService.js";
 
 const { SECRET_KEY } = process.env;
-
-const transport = nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
-  port: 2525,
-  auth: {
-    user: process.env.MAILTRAP_USER,
-    pass: process.env.MAILTRAP_PASSWORD,
-  },
-});
 
 export const registerUser = async (req, res, next) => {
   try {
@@ -31,13 +22,7 @@ export const registerUser = async (req, res, next) => {
     const verificationToken = crypto.randomUUID();
     const avatarURL = gravatar.url(email);
 
-    await transport.sendMail({
-      to: email,
-      from: "iberezhnyi81@gmail.com",
-      subject: "Welcome to your contacts!",
-      html: `<h1 style='color: red'>To confirm your registration, please click on the <a href="http://localhost:3000/api/users/verify/${verificationToken}">link</a></h1>`,
-      text: `To confirm your registration, please open this link http://localhost:3000/api/users/verify/${verificationToken}`,
-    });
+    await sendMailService({ email, verificationToken });
 
     const newUser = await User.create({
       ...req.body,
@@ -45,6 +30,8 @@ export const registerUser = async (req, res, next) => {
       password: hashPassword,
       verificationToken,
     });
+
+    console.log("newUser :>> ", newUser);
 
     res.status(201).send({
       user: { email: newUser.email, subscription: newUser.subscription },
@@ -86,12 +73,10 @@ export const resendingEmail = async (req, res, next) => {
 
     const { verificationToken } = user;
 
-    await transport.sendMail({
-      to: email,
-      from: "iberezhnyi81@gmail.com",
+    await sendMailService({
+      email,
       subject: "(Repeat message) Welcome to your contacts!",
-      html: `<h1 style='color: red'>To confirm your registration, please click on the <a href="http://localhost:3000/api/users/verify/${verificationToken}">link</a></h1>`,
-      text: `To confirm your registration, please open this link http://localhost:3000/api/users/verify/${verificationToken}`,
+      verificationToken,
     });
 
     res.status(200).send({ message: "Verification email sent" });
