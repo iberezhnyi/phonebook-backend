@@ -10,7 +10,7 @@ const { SECRET_KEY } = process.env;
 
 export const registerUser = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
 
     const user = await User.findOne({ email });
 
@@ -31,10 +31,12 @@ export const registerUser = async (req, res, next) => {
       verificationToken,
     });
 
-    console.log("newUser :>> ", newUser);
-
     res.status(201).send({
-      user: { email: newUser.email, subscription: newUser.subscription },
+      user: {
+        name: newUser.name,
+        email: newUser.email,
+        subscription: newUser.subscription,
+      },
     });
   } catch (error) {
     next(error);
@@ -101,9 +103,10 @@ export const loginUser = async (req, res, next) => {
       throw HttpError(401, "Email or password is wrong");
     }
 
-    if (user.verify === false) {
-      throw HttpError(401, "Your account is not verified!");
-    }
+    // Turn on if verification by email needed
+    // if (user.verify === false) {
+    //   throw HttpError(401, "Your account is not verified!");
+    // }
 
     const payload = { id: user._id };
 

@@ -20,9 +20,10 @@ export const authenticate = async (req, res, next) => {
       next(HttpError(401, "Not authorized"));
     }
 
-    if (user.verify === false) {
-      next(HttpError(401, "Your account is not verified!"));
-    }
+    // Turn on if verification by email needed
+    // if (user.verify === false) {
+    //   next(HttpError(401, "Your account is not verified!"));
+    // }
 
     req.user = user;
     next();
