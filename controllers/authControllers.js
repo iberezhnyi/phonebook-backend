@@ -22,7 +22,7 @@ export const registerUser = async (req, res, next) => {
     const verificationToken = crypto.randomUUID();
     const avatarURL = gravatar.url(email);
 
-    await sendMailService({ email, verificationToken });
+    // await sendMailService({ email, verificationToken });
 
     const newUser = await User.create({
       ...req.body,
